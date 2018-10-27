@@ -7,7 +7,10 @@ namespace bawes\myfatoorah;
  * For usage, need to set customer, add products, then request payment link
  *
  * MyFatoorah::configure($merchantCode, $username, $password)
+ *  ->setReturnUrl("https://google.com")
+ *  ->setErrorReturnUrl("https://google.com")
  *  ->setCustomer($name, $email, $phone)
+ *  ->setReferenceId()
  *  ->addProduct("iPhone", 9.750, 5)
  *  ->getPaymentLink();
  *
@@ -36,18 +39,18 @@ class MyFatoorah
     /**
      * @var string Payment gateway url
      */
-    public $gatewayUrl = "https://test.myfatoorah.com/pg/PayGatewayServiceV2.asmx";
+    public $gatewayUrl;
 
     /**
-     * @var string Payment mode, as in which payment gateways will be available
-     * Avail options:
-     * - "BOTH" - Both KNET and creditcard?
-     * - "knet" - KNET only
-     * - "Visa" - VISA/MASTER
-     * - "SADAD" - Sadad Saudi
-     * - "BENEFITS" - BENEFIT BAHRAIN
-     * - "QPAY" - Qpay Qatar
-     * - "UAECC" - UAE debit cards
+     * @var string Payment mode, as in which payment gateway we'll be generating links for
+     * Available options:
+     * - "BOTH" - Generated link sends to MyFatoorah page with all payment methods
+     * - "KNET" - Generated link sends user directly to KNET portal
+     * - "VISA" - Generated link sends user directly to VISA/MASTER portal
+     * - "SADAD" - Generated link sends user directly to Sadad Saudi portal
+     * - "BENEFITS" - Generated link sends user directly to BENEFIT BAHRAIN portal
+     * - "QPAY" - Generated link sends user directly to Qpay Qatar portal
+     * - "UAECC" - Generated link sends user directly to UAE debit cards portal
      */
     public $paymentMode = "BOTH";
 
@@ -107,18 +110,36 @@ class MyFatoorah
     ];
 
     /**
-     * Starting point that returns an instance of this class
-     * @param  $string $merchantCode
-     * @param  $string $username
-     * @param  $string $password
+     * Starting point that returns an instance of this class for live usage
+     * @param  string $merchantCode
+     * @param  string $username
+     * @param  string $password
      * @return static
      */
-    public static function configure($merchantCode, $username, $password)
+    public static function live($merchantCode, $username, $password)
     {
         $instance = new static;
         $instance->merchantUsername = $username;
         $instance->merchantPassword = $password;
         $instance->merchantCode = $merchantCode;
+        $instance->gatewayUrl = "https://www.myfatoorah.com/pg/PayGatewayServiceV2.asmx";
+        return $instance;
+    }
+
+    /**
+     * Starting point that returns an instance of this class for test usage
+     * @param  string $merchantCode
+     * @param  string $username
+     * @param  string $password
+     * @return static
+     */
+    public static function test()
+    {
+        $instance = new static;
+        $instance->merchantUsername = "testapi@myfatoorah.com";
+        $instance->merchantPassword = "E55D0";
+        $instance->merchantCode = "999999";
+        $instance->gatewayUrl = "https://test.myfatoorah.com/pg/PayGatewayServiceV2.asmx";
         return $instance;
     }
 
@@ -206,6 +227,7 @@ class MyFatoorah
      */
     public function getPaymentLink()
     {
+        $requiredAttributes[] = 'gatewayUrl';
         // Validate for payment reference id available
         $requiredAttributes[] = '_referenceId';
         // Validate that customer info is available
