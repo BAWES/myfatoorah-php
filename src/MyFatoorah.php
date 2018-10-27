@@ -6,7 +6,17 @@ namespace bawes\myfatoorah;
  * Allows for processing of payments via MyFatoorah
  * For usage, need to set customer, add products, then request payment link
  *
- * MyFatoorah::configure($merchantCode, $username, $password)
+ * Starting point for live:
+ *
+ * $myF = MyFatoorah::live($merchantCode, $username, $password);
+ *
+ * Starting point for testing:
+ *
+ * $myF = MyFatoorah::test();
+ *
+ * Then chain commands to generate your payment link:
+ *
+ * $myF->setPaymentMode(MyFatoorah::GATEWAY_ALL)
  *  ->setReturnUrl("https://google.com")
  *  ->setErrorReturnUrl("https://google.com")
  *  ->setCustomer($name, $email, $phone)
@@ -19,7 +29,16 @@ namespace bawes\myfatoorah;
  */
 class MyFatoorah
 {
-    const PAYMENT_REQUEST_SUCCESSFUL = 0;
+    const GATEWAY_ALL = "BOTH";
+    const GATEWAY_KNET = "KNET";
+    const GATEWAY_VISA_MASTERCARD = "VISA";
+    const GATEWAY_SAUDI_SADAD = "SADAD";
+    const GATEWAY_BAHRAIN_BENEFIT = "BENEFITS";
+    const GATEWAY_QATAR_QPAY = "QPAY";
+    const GATEWAY_UAECC = "UAECC";
+
+    // Response from MyFatoorah when request for payment link is successful
+    const REQUEST_SUCCESSFUL = 0;
 
     /**
      * @var string MyFatoorah Merchant Username
@@ -52,7 +71,7 @@ class MyFatoorah
      * - "QPAY" - Generated link sends user directly to Qpay Qatar portal
      * - "UAECC" - Generated link sends user directly to UAE debit cards portal
      */
-    public $paymentMode = "BOTH";
+    private $_paymentMode;
 
     /**
      * @var string Return url once customer finishes payment
@@ -144,6 +163,20 @@ class MyFatoorah
     }
 
     /**
+     * Sets payment mode requested for generating MyFatoorah link
+     * Preferably use one of the constants defined in this class
+     * Eg: MyFatoorah::GATEWAY_ALL
+     * @param string $mode
+     * @return self
+     */
+    public function setPaymentMode($mode = self::GATEWAY_ALL)
+    {
+        $this->_paymentMode = $mode;
+
+        return $this;
+    }
+
+    /**
      * Sets customer info for generating payment link
      * @param string $name
      * @param string $email
@@ -228,7 +261,8 @@ class MyFatoorah
     public function getPaymentLink()
     {
         $requiredAttributes[] = 'gatewayUrl';
-        // Validate for payment reference id available
+        // Validate for payment mode and reference id available
+        $requiredAttributes[] = '_paymentMode';
         $requiredAttributes[] = '_referenceId';
         // Validate that customer info is available
         $requiredAttributes[] = '_customerName';
@@ -278,7 +312,7 @@ class MyFatoorah
                     <subtotal>' . $totalPrice . '</subtotal>
                 </totalDC>
                 <paymentModeDC>
-                    <paymentMode>' . $this->paymentMode . '</paymentMode>
+                    <paymentMode>' . $this->_paymentMode . '</paymentMode>
                 </paymentModeDC>
                 <paymentCurrencyDC>
                   <paymentCurrrency>' . $this->_currency . '</paymentCurrrency>
@@ -317,7 +351,7 @@ class MyFatoorah
         $responseMessage = $doc->getElementsByTagName("ResponseMessage")->item(0)->nodeValue;
 
         // On Failure
-        if($responseCode != self::PAYMENT_REQUEST_SUCCESSFUL){
+        if($responseCode != self::REQUEST_SUCCESSFUL){
             throw new \Exception("Error $responseCode: $responseMessage");
         }
 
