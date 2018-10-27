@@ -16,6 +16,7 @@ namespace bawes\myfatoorah;
  */
 class MyFatoorah
 {
+    const PAYMENT_REQUEST_SUCCESSFUL = 0;
 
     /**
      * @var string MyFatoorah Merchant Username
@@ -91,7 +92,7 @@ class MyFatoorah
     private $_currency = "KWD";
 
     /**
-     * @var string[] Parsing response from MyFatoorah using these codes
+     * @var array Parsing response from MyFatoorah using these codes
      */
     private $_responseCodeDetails = [
         0 => "Success",
@@ -232,8 +233,7 @@ class MyFatoorah
             $productData .= '</ProductDC>';
         }
 
-        $post_string = '
-        <?xml version="1.0" encoding="windows-1256"?>
+        $post_string = '<?xml version="1.0" encoding="windows-1256"?>
         <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
             <soap12:Body>
             <PaymentRequest xmlns="http://tempuri.org/">
@@ -291,19 +291,19 @@ class MyFatoorah
         }
 
         $doc->loadXML(html_entity_decode($file_contents));
-        $referenceID = $doc->getElementsByTagName("referenceID")->item(0)->nodeValue;
         $responseCode = $doc->getElementsByTagName("ResponseCode")->item(0)->nodeValue;
         $responseMessage = $doc->getElementsByTagName("ResponseMessage")->item(0)->nodeValue;
 
-        // On Success
-        if ($responseCode == 0) {
-            $paymentUrl = $doc->getElementsByTagName("paymentURL")->item(0)->nodeValue;
-
-            return $paymentUrl;
+        // On Failure
+        if($responseCode != self::PAYMENT_REQUEST_SUCCESSFUL){
+            throw new \Exception("Error $responseCode: $responseMessage");
         }
 
-        // On Failure
-        throw new \Exception("Reference ID: $referenceID : Unable to generate link due to response code: ". $ResponseCode. "and message: ".$responseMessage);
+        // On Success
+        $referenceID = $doc->getElementsByTagName("referenceID")->item(0)->nodeValue;
+        $paymentUrl = $doc->getElementsByTagName("paymentURL")->item(0)->nodeValue;
+
+        return $paymentUrl;
     }
 
     /**
