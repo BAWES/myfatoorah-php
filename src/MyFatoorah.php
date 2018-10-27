@@ -223,11 +223,11 @@ class MyFatoorah
         $productData = "";
         foreach($this->_products as $product){
             $totalPrice += $product['price'] * $product['quantity'];
-            $productdata .= '<ProductDC>';
-            $productdata .= '<product_name>' . Html::encode($product['name']) . '</product_name>';
-            $productdata .= '<unitPrice>' . $product['price'] . '</unitPrice>';
-            $productdata .= '<qty>' . $product['quantity'] . '</qty>';
-            $productdata .= '</ProductDC>';
+            $productData .= '<ProductDC>';
+            $productData .= '<product_name>' . htmlspecialchars($product['name']) . '</product_name>';
+            $productData .= '<unitPrice>' . $product['price'] . '</unitPrice>';
+            $productData .= '<qty>' . $product['quantity'] . '</qty>';
+            $productData .= '</ProductDC>';
         }
 
         $post_string = '
@@ -282,7 +282,7 @@ class MyFatoorah
         $err = curl_error($soap_do);
         $file_contents = htmlspecialchars($result);
         curl_close($soap_do);
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
 
         if($doc == null){
             throw new \Exception("Failed creating a new DOM document");
@@ -312,8 +312,8 @@ class MyFatoorah
     {
         foreach ($requiredAttributes as $attribute) {
             if ($this->$attribute === null) {
-                throw new Exception(strtr('"{class}::{attribute}" cannot be empty.', [
-                    '{class}' => static::className(),
+                throw new \Exception(strtr('"{class}::{attribute}" cannot be empty.', [
+                    '{class}' => static::class,
                     '{attribute}' => '$' . $attribute
                 ]));
             }
