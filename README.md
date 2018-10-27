@@ -21,3 +21,50 @@ or add
 ```
 
 to the require section of your application's `composer.json` file.
+
+
+## Usage
+
+First we need to decide which environment we want to use
+
+### Step 1: Initialize based on the environment
+
+#### Test Environment
+```php
+<?php
+use bawes/myfatoorah/MyFatoorah;
+
+$my = MyFatoorah::test();
+```
+
+#### Live Environment
+```php
+<?php
+use bawes/myfatoorah/MyFatoorah;
+
+$merchantCode = "[Your merchant code here]";
+$username = "[Your merchant username here]";
+$password = "[Your merchant password here]";
+$my = MyFatoorah::live($merchantCode, $username, $password);
+```
+
+### Step 2: Build your request as follows
+```php
+<?php
+use bawes/myfatoorah/MyFatoorah;
+
+$merchantCode = "[Your merchant code here]";
+$username = "[Your merchant username here]";
+$password = "[Your merchant password here]";
+$my = MyFatoorah::live($merchantCode, $username, $password);
+
+$my->setPaymentMode(MyFatoorah::GATEWAY_ALL)
+->setReturnUrl("https://google.com")
+->setErrorReturnUrl("https://google.com")
+->setCustomer("Khalid", "customer@email.com", "97738271")
+->setReferenceId() //Pass unique order number or leave empty to use time()
+->addProduct("iPhone", 5.350, 3)
+->addProduct("Samsung", 12.000, 1)
+->getPaymentLink();
+
+```
