@@ -1,0 +1,11 @@
+{
+    "name": "bawes/myfatoorah-php",
+    "description": "MyFatoorah integration guide",
+    "authors": [
+        {
+            "name": "Khalid",
+            "email": "khalid@bawes.net"
+        }
+    ],
+    "require": {}
+}
