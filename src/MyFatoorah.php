@@ -115,11 +115,9 @@ class MyFatoorah
     public static function configure($merchantCode, $username, $password)
     {
         $instance = new static;
-
         $instance->merchantUsername = $username;
         $instance->merchantPassword = $password;
         $instance->merchantCode = $merchantCode;
-
         return $instance;
     }
 
@@ -148,8 +146,11 @@ class MyFatoorah
      * @param string $id unique id for reference
      * @return self
      */
-    public function setReferenceId($id = time())
+    public function setReferenceId($id = null)
     {
+        // Set $id to current time for random unique value
+        if(!$id) $id = time();
+
         $this->_referenceId = $id;
 
         return $this;
@@ -307,7 +308,7 @@ class MyFatoorah
      * Validate that required attributes exist
      * @param string[] $requiredAttributes
      */
-    private _validateAttributes($requiredAttributes)
+    private function _validateAttributes($requiredAttributes)
     {
         foreach ($requiredAttributes as $attribute) {
             if ($this->$attribute === null) {
