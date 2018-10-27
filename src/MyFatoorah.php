@@ -208,7 +208,9 @@ class MyFatoorah
         // Validate for payment reference id available
         $requiredAttributes[] = '_referenceId';
         // Validate that customer info is available
-        $requiredAttributes[] = ['_customerName', '_customerEmail', '_customerPhone'];
+        $requiredAttributes[] = '_customerName';
+        $requiredAttributes[] = '_customerEmail';
+        $requiredAttributes[] = '_customerPhone';
         // Validate for success url
         $requiredAttributes[] = '_customerReturnUrl';
         // Validate for error url
