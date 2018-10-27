@@ -216,7 +216,7 @@ class MyFatoorah
         $this->_validateAttributes($requiredAttributes);
 
         if(count($this->_products) == 0){
-            throw new InvalidConfigException('Product list cant be empty');
+            throw new \Exception('Product list cant be empty');
         }
 
         $totalPrice = 0;
