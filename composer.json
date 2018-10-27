@@ -1,11 +1,27 @@
 {
     "name": "bawes/myfatoorah-php",
-    "description": "MyFatoorah integration guide",
+    "description": "MyFatoorah PHP Library",
+    "keywords": [
+        "myfatoorah",
+        "payment processing",
+        "api"
+     ],
+    "homepage": "https://myfatoorah.com/",
+    "license": "MIT",
     "authors": [
         {
-            "name": "Khalid",
-            "email": "khalid@bawes.net"
+            "name": "Khalid Al-Mutawa",
+            "homepage": "http://bawes.net",
+            "email": "contact@bawes.net"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=5.4.0",
+        "ext-curl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "bawes\\myfatoorah\\": "src"
+        }
+    },
 }
