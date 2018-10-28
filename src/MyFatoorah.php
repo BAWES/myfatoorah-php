@@ -29,15 +29,38 @@ namespace bawes\myfatoorah;
  */
 class MyFatoorah
 {
+    /**
+     * @var string Generated link sends to MyFatoorah page with all payment methods
+     */
     const GATEWAY_ALL = "BOTH";
+    /**
+     * @var string Generated link sends user directly to KNET portal
+     */
     const GATEWAY_KNET = "KNET";
+    /**
+     * @var string Generated link sends user directly to VISA/MASTER portal
+     */
     const GATEWAY_VISA_MASTERCARD = "VISA";
+    /**
+     * @var string Generated link sends user directly to Sadad Saudi portal
+     */
     const GATEWAY_SAUDI_SADAD = "SADAD";
+    /**
+     * @var string Generated link sends user directly to BENEFIT BAHRAIN portal
+     */
     const GATEWAY_BAHRAIN_BENEFIT = "BENEFITS";
+    /**
+     * @var string Generated link sends user directly to Qpay Qatar portal
+     */
     const GATEWAY_QATAR_QPAY = "QPAY";
+    /**
+     * @var string Generated link sends user directly to UAE debit cards portal
+     */
     const GATEWAY_UAECC = "UAECC";
 
-    // Response from MyFatoorah when request for payment link is successful
+    /**
+     * @var integer Response from MyFatoorah when request for payment link is successful
+     */
     const REQUEST_SUCCESSFUL = 0;
 
     /**
@@ -63,13 +86,13 @@ class MyFatoorah
     /**
      * @var string Payment mode, as in which payment gateway we'll be generating links for
      * Available options:
-     * - "BOTH" - Generated link sends to MyFatoorah page with all payment methods
-     * - "KNET" - Generated link sends user directly to KNET portal
-     * - "VISA" - Generated link sends user directly to VISA/MASTER portal
-     * - "SADAD" - Generated link sends user directly to Sadad Saudi portal
-     * - "BENEFITS" - Generated link sends user directly to BENEFIT BAHRAIN portal
-     * - "QPAY" - Generated link sends user directly to Qpay Qatar portal
-     * - "UAECC" - Generated link sends user directly to UAE debit cards portal
+     * - "BOTH" / MyFatoorah::GATEWAY_ALL
+     * - "KNET" / MyFatoorah::GATEWAY_KNET
+     * - "VISA" / MyFatoorah::GATEWAY_VISA_MASTERCARD
+     * - "SADAD" / MyFatoorah::GATEWAY_SAUDI_SADAD
+     * - "BENEFITS" / MyFatoorah::GATEWAY_BAHRAIN_BENEFIT
+     * - "QPAY" / MyFatoorah::GATEWAY_QATAR_QPAY
+     * - "UAECC" / MyFatoorah::GATEWAY_UAECC
      */
     private $_paymentMode;
 
