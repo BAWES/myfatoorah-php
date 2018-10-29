@@ -349,31 +349,8 @@ class MyFatoorah
           </soap12:Body>
         </soap12:Envelope>';
 
-        $soap_do = curl_init();
-        curl_setopt($soap_do, CURLOPT_URL, $this->gatewayUrl);
-        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
-        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($soap_do, CURLOPT_POST, true);
-        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $post_string);
-        curl_setopt($soap_do, CURLOPT_HTTPHEADER, array(
-            'Content-Type: text/xml; charset=utf-8',
-            'Content-Length: ' . strlen($post_string)
-        ));
-        curl_setopt($soap_do, CURLOPT_USERPWD, $this->merchantUsername . ":" . $this->merchantPassword);
-        $result = curl_exec($soap_do);
-        $err = curl_error($soap_do);
-        $file_contents = htmlspecialchars($result);
-        curl_close($soap_do);
-        $doc = new \DOMDocument();
+        $doc = $this->_makeApiCall($post_string);
 
-        if($doc == null){
-            throw new \Exception("Failed creating a new DOM document");
-        }
-
-        $doc->loadXML(html_entity_decode($file_contents));
         $responseCode = $doc->getElementsByTagName("ResponseCode")->item(0)->nodeValue;
         $responseMessage = $doc->getElementsByTagName("ResponseMessage")->item(0)->nodeValue;
 
@@ -393,6 +370,61 @@ class MyFatoorah
     }
 
     /**
+     * Request order status from MyFatoorah by providing your reference id
+     * which you initially received after generating the payment link via MyFatoorah::getPaymentLinkAndReference();
+     *
+     * Through order status you'll be able to know whether payment went through or not.
+     * You can call this for a manual refresh or wait for a callback from MyFatoorah api after user pays or cancels payment process
+     *
+     * @param type $referenceId
+     * @return array response
+     */
+    public function getOrderStatus($referenceId)
+    {
+        $post_string = '<?xml version="1.0" encoding="utf-8"?>
+        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+          <soap:Body>
+            <GetOrderStatusRequest xmlns="http://tempuri.org/">
+              <getOrderStatusRequestDC>
+                <merchant_code>' . $this->merchantCode . '</merchant_code>
+                <merchant_username>' . $this->merchantUsername . '</merchant_username>
+                <merchant_password>' . $this->merchantPassword . '</merchant_password>
+                <referenceID>' . $referenceId . '</referenceID>
+              </getOrderStatusRequestDC>
+            </GetOrderStatusRequest>
+          </soap:Body>
+        </soap:Envelope>';
+
+        $doc = $this->_makeApiCall($post_string);
+
+        $response = [];
+
+        $response['responseCode'] = $doc->getElementsByTagName("ResponseCode")->item(0)->nodeValue;
+        $response['responseMessage'] = $doc->getElementsByTagName("ResponseMessage")->item(0)->nodeValue;
+        $response['result'] = $doc->getElementsByTagName("result")->item(0)->nodeValue; // If “CAPTURED” ONLY its successful rest all results are invalid
+
+        // On Success
+        if($response['responseCode'] == self::REQUEST_SUCCESSFUL){
+            $response['orderId'] = $doc->getElementsByTagName("OrderID")->item(0)->nodeValue; // MyFatoorah Order ID
+            $response['payTransactionId'] = $doc->getElementsByTagName("PayTxnID")->item(0)->nodeValue; // MyFatoorah Transaction ID
+
+            $response['grossAmountPaid'] = $doc->getElementsByTagName("gross_amount")->item(0)->nodeValue; // The Gross Amount paid
+            $response['netAmountToBeDeposited'] = $doc->getElementsByTagName("net_amount")->item(0)->nodeValue; // The Net Amount which will be deposited in the merchant account
+
+            $response['payMode'] = $doc->getElementsByTagName("Paymode")->item(0)->nodeValue; // Payment Mode (KNET, Master or Visa)
+        }
+
+        // Append UDF values
+        $response['udf1'] = $doc->getElementsByTagName("udf1")->item(0)->nodeValue;
+        $response['udf2'] = $doc->getElementsByTagName("udf2")->item(0)->nodeValue;
+        $response['udf3'] = $doc->getElementsByTagName("udf3")->item(0)->nodeValue;
+        $response['udf4'] = $doc->getElementsByTagName("udf4")->item(0)->nodeValue;
+        $response['udf5'] = $doc->getElementsByTagName("udf5")->item(0)->nodeValue;
+
+        return $response;
+    }
+
+    /**
      * Validate that required attributes exist
      * @param string[] $requiredAttributes
      */
@@ -406,6 +438,42 @@ class MyFatoorah
                 ]));
             }
         }
+    }
+
+    /**
+     * Sends post string and returns api call results as a dom document for parsing
+     * @param type $postString
+     * @return \DOMDocument
+     */
+    private function _makeApiCall($postString)
+    {
+        $soap_do = curl_init();
+        curl_setopt($soap_do, CURLOPT_URL, $this->gatewayUrl);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $postString);
+        curl_setopt($soap_do, CURLOPT_HTTPHEADER, array(
+            'Content-Type: text/xml; charset=utf-8',
+            'Content-Length: ' . strlen($postString)
+        ));
+        curl_setopt($soap_do, CURLOPT_USERPWD, $this->merchantUsername . ":" . $this->merchantPassword);
+        $result = curl_exec($soap_do);
+        $err = curl_error($soap_do);
+        $file_contents = htmlspecialchars($result);
+        curl_close($soap_do);
+
+        $doc = new \DOMDocument();
+        if($doc == null){
+            throw new \Exception("Failed creating a new DOM document");
+        }
+
+        $doc->loadXML(html_entity_decode($file_contents));
+
+        return $doc;
     }
 
 }

@@ -68,6 +68,31 @@ $my->setPaymentMode(MyFatoorah::GATEWAY_ALL)
 ->getPaymentLinkAndReference();
 
 $redirectLink = $my['paymentUrl'];
-$myfatoorahID = $my['paymentRef'];
+$myfatoorahRefId = $my['paymentRef'];
+
+```
+
+### Step 3: Request Order Status for Payment status confirmation
+
+Use `MyFatoorah::getOrderStatus($referenceId)` to get an update on the status of the payment.
+This is best called after receiving a callback from MyFatoorah's returnUrl or errorReturnUrl.
+You can also manually call this function after an interval if you store the reference id locally.
+
+#### Example
+```php
+<?php
+use bawes/myfatoorah/MyFatoorah;
+
+// Example Ref ID
+$myfatoorahRefId = $_GET['id'];
+
+// Order status from Test environment
+MyFatoorah::test()->getOrderStatus($myfatoorahRefId);
+
+// Order status from Test environment
+$merchantCode = "[Your merchant code here]";
+$username = "[Your merchant username here]";
+$password = "[Your merchant password here]";
+$my = MyFatoorah::live($merchantCode, $username, $password)->getOrderStatus($myfatoorahRefId);
 
 ```
