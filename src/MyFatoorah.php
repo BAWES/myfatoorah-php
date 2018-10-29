@@ -8,21 +8,24 @@ namespace bawes\myfatoorah;
  *
  * Starting point for live:
  *
- * $myF = MyFatoorah::live($merchantCode, $username, $password);
+ * $pay = MyFatoorah::live($merchantCode, $username, $password);
  *
  * Starting point for testing:
  *
- * $myF = MyFatoorah::test();
+ * $pay = MyFatoorah::test();
  *
  * Then chain commands to generate your payment link:
  *
- * $myF->setPaymentMode(MyFatoorah::GATEWAY_ALL)
+ * $pay->setPaymentMode(MyFatoorah::GATEWAY_ALL)
  *  ->setReturnUrl("https://google.com")
  *  ->setErrorReturnUrl("https://google.com")
  *  ->setCustomer($name, $email, $phone)
  *  ->setReferenceId()
  *  ->addProduct("iPhone", 9.750, 5)
- *  ->getPaymentLink();
+ *  ->getPaymentLinkAndReference();
+ *
+ * $redirectLink = $pay['paymentUrl'];
+ * $myfatoorahID = $pay['paymentRef'];
  *
  * @author Khalid Al-Mutawa <khalid@bawes.net>
  * @link http://www.bawes.net
@@ -177,10 +180,7 @@ class MyFatoorah
      */
     public static function test()
     {
-        $instance = new static;
-        $instance->merchantUsername = "testapi@myfatoorah.com";
-        $instance->merchantPassword = "E55D0";
-        $instance->merchantCode = "999999";
+        $instance = self::live("999999", "testapi@myfatoorah.com", "E55D0");
         $instance->gatewayUrl = "https://test.myfatoorah.com/pg/PayGatewayServiceV2.asmx";
         return $instance;
     }
@@ -278,10 +278,14 @@ class MyFatoorah
     }
 
     /**
-     * Request payment link from MyFatoorah
-     * @return string the payment url to redirect to
+     * Request payment link and its reference from MyFatoorah
+     * return [
+     *      'paymentUrl' => $paymentUrl,
+     *      'paymentRef' => $referenceID
+     * ];
+     * @return array the payment url to redirect to and its ID on myfatoorah
      */
-    public function getPaymentLink()
+    public function getPaymentLinkAndReference()
     {
         $requiredAttributes[] = 'gatewayUrl';
         // Validate for payment mode and reference id available
@@ -382,7 +386,10 @@ class MyFatoorah
         $referenceID = $doc->getElementsByTagName("referenceID")->item(0)->nodeValue;
         $paymentUrl = $doc->getElementsByTagName("paymentURL")->item(0)->nodeValue;
 
-        return $paymentUrl;
+        return [
+            'paymentUrl' => $paymentUrl,
+            'paymentRef' => $referenceID
+        ];
     }
 
     /**

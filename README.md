@@ -65,6 +65,9 @@ $my->setPaymentMode(MyFatoorah::GATEWAY_ALL)
 ->setReferenceId() //Pass unique order number or leave empty to use time()
 ->addProduct("iPhone", 5.350, 3)
 ->addProduct("Samsung", 12.000, 1)
-->getPaymentLink();
+->getPaymentLinkAndReference();
+
+$redirectLink = $my['paymentUrl'];
+$myfatoorahID = $my['paymentRef'];
 
 ```
