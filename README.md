@@ -12,12 +12,12 @@ The preferred way to install this library is through [composer](http://getcompos
 Either run
 
 ```bash
-$ composer require bawes/myfatoorah-php:dev-master
+$ composer require bawes/myfatoorah-php
 ```
 or add
 
 ```json
-"bawes/myfatoorah-php" : "dev-master"
+"bawes/myfatoorah-php": "^1.0"
 ```
 
 to the require section of your application's `composer.json` file.
