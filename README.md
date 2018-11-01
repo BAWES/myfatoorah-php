@@ -96,3 +96,12 @@ $password = "[Your merchant password here]";
 $my = MyFatoorah::live($merchantCode, $username, $password)->getOrderStatus($myfatoorahRefId);
 
 ```
+
+## Cards for testing
+
+### KNET
+
+| Card Number   | Pin/Expiry     | Result  |
+| ------------- |:-------------:| -----:|
+| 8888880000000001     | anything      | CAPTURED |
+| 8888880000000002     | anything      |   NOT CAPTURED |
