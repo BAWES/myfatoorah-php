@@ -82,7 +82,7 @@ Use `MyFatoorah::getOrderStatus($referenceId)` to get an update on the status of
 This is best called after receiving a callback from MyFatoorah's returnUrl or errorReturnUrl.
 You can also manually call this function after an interval if you store the reference id locally.
 
-#### Example
+#### Sample Order Status Request
 ```php
 <?php
 use bawes/myfatoorah/MyFatoorah;
@@ -90,15 +90,59 @@ use bawes/myfatoorah/MyFatoorah;
 // Example Ref ID
 $myfatoorahRefId = $_GET['id'];
 
-// Order status from Test environment
-MyFatoorah::test()->getOrderStatus($myfatoorahRefId);
+// Order status on Test environment
+$orderStatus = MyFatoorah::test()
+    ->getOrderStatus($myfatoorahRefId);
 
-// Order status from Test environment
+// Order status on Live environment
 $merchantCode = "[Your merchant code here]";
 $username = "[Your merchant username here]";
 $password = "[Your merchant password here]";
-$my = MyFatoorah::live($merchantCode, $username, $password)->getOrderStatus($myfatoorahRefId);
+$orderStatus = MyFatoorah::live($merchantCode, $username, $password)
+    ->getOrderStatus($myfatoorahRefId);
+```
 
+#### Order Status Response (Success)
+
+```php
+<?php
+$orderStatus = [
+    'responseCode' => '0', //MyFatoorah::REQUEST_SUCCESSFUL
+    'responseMessage' => 'SUCCESS',
+    'result' => 'CAPTURED',
+
+    // Successful payment fields
+    'payMode' => 'KNET',
+    'orderId' => '1085183',
+    'payTransactionId' => '673386261283050',
+    'grossAmountPaid' => '32.500',
+    'netAmountToBeDeposited' => '32.300',
+
+    // User defined fields
+    'udf1' => '',
+    'udf2' => '',
+    'udf3' => '',
+    'udf4' => '',
+    'udf5' => ''
+]
+```
+
+#### Order Status Response (Failure)
+
+```php
+<?php
+$orderStatus = [
+    'responseCode' => '2009',
+    'responseMessage' => 'Transaction Failed Messages',
+    'result' => 'Payment Server detected an error',
+
+    // User defined fields
+    'udf1' => '',
+    'udf2' => '',
+    'udf3' => '',
+    'udf4' => '',
+    'udf5' => ''
+]
 ```
 
 ## Payment Gateways
