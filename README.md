@@ -169,6 +169,8 @@ These cards will only work if you initialize using `MyFatoorah::test()` environm
 | Mastercard | 5271045423029111     | anything      | anything |
 | Visa | 4012001037141112     | 01/2022      |  684 |
 
-| Payment Method   | Account ID   | Password     |
-| ------------- |:-------------:| -----:|
-| Sadad account | arun123     | Aa123456      |
+Or you can use your *Sadad account*
+
+| Account ID   | Password     |
+| ------------- | -----:|
+| arun123     | Aa123456      |
