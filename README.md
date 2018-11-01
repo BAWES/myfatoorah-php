@@ -48,7 +48,7 @@ $password = "[Your merchant password here]";
 $my = MyFatoorah::live($merchantCode, $username, $password);
 ```
 
-### Step 2: Build your request as follows
+### Step 2: Request a payment link and redirect to it
 ```php
 <?php
 use bawes/myfatoorah/MyFatoorah;
@@ -67,8 +67,12 @@ $my->setPaymentMode(MyFatoorah::GATEWAY_ALL)
 ->addProduct("Samsung", 12.000, 1)
 ->getPaymentLinkAndReference();
 
-$redirectLink = $my['paymentUrl'];
-$myfatoorahRefId = $my['paymentRef'];
+$paymentUrl = $my['paymentUrl'];
+$myfatoorahRefId = $my['paymentRef']; //good idea to store this for later status checks
+
+// Redirect to payment url
+header("Location: $paymentUrl");
+die();
 
 ```
 
@@ -97,11 +101,74 @@ $my = MyFatoorah::live($merchantCode, $username, $password)->getOrderStatus($myf
 
 ```
 
-## Cards for testing
+## Payment Gateways
 
-### KNET
+Configure the gateway you wish to use by passing GATEWAY constants available on the `MyFatoorah` class to `MyFatoorah::setPaymentMode`.
+
+* `MyFatoorah::GATEWAY_ALL` - Generated link sends to MyFatoorah page with all payment methods
+* `MyFatoorah::GATEWAY_KNET` - Generated link sends user directly to KNET portal
+* `MyFatoorah::GATEWAY_VISA_MASTERCARD` - Generated link sends user directly to VISA/MASTER portal
+* `MyFatoorah::GATEWAY_SAUDI_SADAD` - Generated link sends user directly to Sadad Saudi portal
+* `MyFatoorah::GATEWAY_BAHRAIN_BENEFIT` - Generated link sends user directly to BENEFIT BAHRAIN portal
+* `MyFatoorah::GATEWAY_QATAR_QPAY` - Generated link sends user directly to Qpay Qatar portal
+* `MyFatoorah::GATEWAY_UAECC` - Generated link sends user directly to UAE debit cards portal
+
+
+Usage Example:
+```php
+<?php
+use bawes/myfatoorah/MyFatoorah;
+
+$my = MyFatoorah::live($merchantCode, $username, $password);
+$my->setPaymentMode(MyFatoorah::GATEWAY_ALL)
+```
+
+### Test cards
+
+These cards will only work if you initialize using `MyFatoorah::test()` environment.
+
+#### KNET
 
 | Card Number   | Pin/Expiry     | Result  |
 | ------------- |:-------------:| -----:|
 | 8888880000000001     | anything      | CAPTURED |
 | 8888880000000002     | anything      |   NOT CAPTURED |
+
+#### Benefits
+
+| Card Number   | Expiry Date     | Pin  | Result  |
+| ------------- |:-------------:| :-----:| --------:|
+| 2222220123456789     | 12/27 |  1234    | CAPTURED |
+| 7777770123456789     | 12/27 |  1234   |   NOT CAPTURED |
+| 1111110123456789     | 12/27 |  1234   |   NOT CAPTURED |
+
+#### Visa
+
+| Card Number   | Expiry Date     | CVV  |
+| ------------- |:-------------:| -----:|
+| 4005550000000001     | 05/18      | 123 |
+| 4557012345678902     | 05/18      |   123 |
+
+#### Mastercard
+
+| Card Number   | Expiry Date     | CVV  |
+| ------------- |:-------------:| -----:|
+| 5123456789012346     | 05/18      | 123 |
+| 5313581000123430     | 05/18      | 123 |
+
+#### Amex
+
+| Card Number   | Expiry Date     | Pin  |
+| ------------- |:-------------:| -----:|
+| 345678901234564     | 05/17      | 1234 |
+
+#### Sadad
+
+| Payment Method   | Card Number   | Expiry Date     | CVV  |
+| ------------- |:-------------:| -----:|
+| Mastercard | 5271045423029111     | anything      | anything |
+| Visa | 4012001037141112     | 01/2022      |  684 |
+
+| Payment Method   | Account ID   | Password     |
+| ------------- |:-------------:| -----:|
+| Sadad account | arun123     | Aa123456      |
