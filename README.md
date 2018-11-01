@@ -123,18 +123,18 @@ $my = MyFatoorah::live($merchantCode, $username, $password);
 $my->setPaymentMode(MyFatoorah::GATEWAY_ALL)
 ```
 
-### Test cards
+## Test cards
 
 These cards will only work if you initialize using `MyFatoorah::test()` environment.
 
-#### KNET
+### KNET
 
 | Card Number   | Pin/Expiry     | Result  |
 | ------------- |:-------------:| -----:|
 | 8888880000000001     | anything      | CAPTURED |
 | 8888880000000002     | anything      |   NOT CAPTURED |
 
-#### Benefits
+### Benefits
 
 | Card Number   | Expiry Date     | Pin  | Result  |
 | ------------- |:-------------:| :-----:| --------:|
@@ -142,27 +142,27 @@ These cards will only work if you initialize using `MyFatoorah::test()` environm
 | 7777770123456789     | 12/27 |  1234   |   NOT CAPTURED |
 | 1111110123456789     | 12/27 |  1234   |   NOT CAPTURED |
 
-#### Visa
+### Visa
 
 | Card Number   | Expiry Date     | CVV  |
 | ------------- |:-------------:| -----:|
 | 4005550000000001     | 05/18      | 123 |
 | 4557012345678902     | 05/18      |   123 |
 
-#### Mastercard
+### Mastercard
 
 | Card Number   | Expiry Date     | CVV  |
 | ------------- |:-------------:| -----:|
 | 5123456789012346     | 05/18      | 123 |
 | 5313581000123430     | 05/18      | 123 |
 
-#### Amex
+### Amex
 
 | Card Number   | Expiry Date     | Pin  |
 | ------------- |:-------------:| -----:|
 | 345678901234564     | 05/17      | 1234 |
 
-#### Sadad
+### Sadad
 
 | Payment Method   | Card Number   | Expiry Date     | CVV  |
 | ------------- |:-------------:|:-------------:| -----:|
